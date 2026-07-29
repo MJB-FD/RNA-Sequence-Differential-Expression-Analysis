@@ -1,55 +1,75 @@
-# RNA-seq Differential Expression Project
+# Project Information
 
-## Organism
+## Objective
 
-Homo sapiens
+Build a reproducible RNA-seq differential expression analysis pipeline from raw sequencing reads to biological interpretation while demonstrating practical bioinformatics skills and reproducible research practices.
 
-## Experiment
+---
 
-Bulk RNA sequencing
+## Dataset
 
-## Sequencing Platform
+* **Source:** NCBI GEO (GSE52778)
+* **Organism:** *Homo sapiens*
+* **Sequencing:** Bulk RNA-seq
+* **Library Layout:** Paired-end
+* **Read Length:** 63 bp
 
-Illumina
+| Condition     | Samples                                        |
+| ------------- | ---------------------------------------------- |
+| Untreated     | SRR1039508, SRR1039512, SRR1039516, SRR1039520 |
+| Dexamethasone | SRR1039509, SRR1039513, SRR1039517, SRR1039521 |
 
-## Experimental Design
+**Total samples:** 8
 
-Control vs Treatment
+---
 
-3 biological replicates per condition
+## Biological Question
 
-## Goal
+How does dexamethasone treatment affect gene expression compared with untreated controls?
 
-Identify genes that are differentially expressed between treatment and control samples.
+---
 
-## Workflow
+## Planned Workflow
 
-FASTQ
+1. Download sequencing data
+2. Convert SRA → FASTQ
+3. FastQC
+4. MultiQC
+5. Read trimming (if required)
+6. HISAT2 alignment
+7. featureCounts quantification
+8. DESeq2 differential expression
+9. Functional enrichment and visualization
 
-↓
+---
 
-FastQC
+## Software
 
-↓
+* Linux (WSL)
+* Bash
+* SRA Toolkit
+* FastQC
+* MultiQC
+* HISAT2
+* SAMtools
+* featureCounts
+* R / DESeq2
+* Git & GitHub
 
-fastp
+---
 
-↓
+## Current Status
 
-HISAT2
+**Completed**
 
-↓
+* Repository initialized
+* Dataset downloaded
+* SRA files converted to compressed FASTQ
+* FastQC completed
 
-samtools
+**Next**
 
-↓
+* Aggregate QC with MultiQC
+* Assess overall sequencing quality
+* Determine whether trimming is required
 
-featureCounts
-
-↓
-
-DESeq2
-
-↓
-
-Biological interpretation
