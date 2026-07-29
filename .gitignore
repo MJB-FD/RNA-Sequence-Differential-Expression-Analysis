@@ -1,0 +1,25 @@
+# Raw sequencing files
+data/raw/
+
+# Large alignment files
+*.sam
+*.bam
+*.bai
+
+# Individual FastQC outputs
+results/qc/fastqc_raw/
+
+# Log files
+logs/*.log
+
+# Reference genome files
+reference/*.fa
+reference/*.fasta
+reference/*.fa.gz
+reference/*.fasta.gz
+reference/*.gtf
+reference/*.gtf.gz
+
+# Temporary files
+*.tmp
+.DS_Store
