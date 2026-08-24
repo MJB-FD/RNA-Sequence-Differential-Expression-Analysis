@@ -13,13 +13,11 @@ results/qc/fastqc_raw/
 logs/*.log
 
 # Reference genome files
-reference/*.fa
-reference/*.fasta
-reference/*.fa.gz
-reference/*.fasta.gz
-reference/*.gtf
-reference/*.gtf.gz
+reference/
 
 # Temporary files
 *.tmp
 .DS_Store
+
+# Large generated count matrix
+results/counts/gene_counts.txt
