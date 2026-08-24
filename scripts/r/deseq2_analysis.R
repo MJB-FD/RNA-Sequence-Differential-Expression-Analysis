@@ -8,6 +8,8 @@
 library(DESeq2)
 library(AnnotationDbi)
 library(org.Hs.eg.db)
+library(ggplot2)
+library(pheatmap)
 
 
 # 2. File paths
@@ -152,7 +154,7 @@ significant <- subset(
 )
 
 
-# 16. Save results
+# 16. Save tables
 
 write.csv(
   results_df,
@@ -164,4 +166,148 @@ write.csv(
   significant,
   "results/differential_expression/significant_genes.csv",
   row.names = FALSE
+)
+
+
+# 17. Variance-stabilizing transformation
+
+vsd <- vst(
+  dds,
+  blind = FALSE
+)
+
+
+# 18. Save PCA plot
+
+png(
+  "results/differential_expression/pca_plot.png",
+  width = 1200,
+  height = 900,
+  res = 150
+)
+
+plotPCA(
+  vsd,
+  intgroup = c("condition", "cell_line")
+)
+
+dev.off()
+
+
+# 19. Save MA plot
+
+png(
+  "results/differential_expression/ma_plot.png",
+  width = 1200,
+  height = 900,
+  res = 150
+)
+
+plotMA(
+  results_dex,
+  alpha = 0.05,
+  ylim = c(-6, 6)
+)
+
+dev.off()
+
+
+# 20. Prepare volcano plot data
+
+results_df$significance <- "Not significant"
+
+results_df$significance[
+  !is.na(results_df$padj) &
+  results_df$padj < 0.05 &
+  results_df$log2FoldChange >= 1
+] <- "Upregulated"
+
+results_df$significance[
+  !is.na(results_df$padj) &
+  results_df$padj < 0.05 &
+  results_df$log2FoldChange <= -1
+] <- "Downregulated"
+
+
+# 21. Save volcano plot
+
+volcano_plot <- ggplot(
+  results_df,
+  aes(
+    x = log2FoldChange,
+    y = -log10(padj),
+    color = significance
+  )
+) +
+  geom_point(
+    alpha = 0.6,
+    size = 1.5
+  ) +
+  geom_vline(
+    xintercept = c(-1, 1),
+    linetype = "dashed"
+  ) +
+  geom_hline(
+    yintercept = -log10(0.05),
+    linetype = "dashed"
+  ) +
+  labs(
+    title = "Dexamethasone vs Untreated",
+    x = "Log2 Fold Change",
+    y = "-Log10 Adjusted P-value"
+  ) +
+  theme_minimal()
+
+ggsave(
+  "results/differential_expression/volcano_plot.png",
+  plot = volcano_plot,
+  width = 8,
+  height = 6,
+  dpi = 150
+)
+
+
+# 22. Prepare top 30 genes for heatmap
+
+top_results <- results_df[
+  !is.na(results_df$padj),
+]
+
+top_results <- top_results[
+  order(top_results$padj),
+]
+
+top_results <- top_results[1:30, ]
+
+top_genes <- rownames(top_results)
+
+heatmap_matrix <- assay(vsd)[top_genes, ]
+
+
+# 23. Prepare heatmap labels
+
+gene_labels <- ifelse(
+  is.na(top_results$gene_symbol),
+  top_results$ensembl_id,
+  top_results$gene_symbol
+)
+
+annotation_col <- data.frame(
+  condition = metadata$condition,
+  cell_line = metadata$cell_line
+)
+
+rownames(annotation_col) <- rownames(metadata)
+
+
+# 24. Save heatmap
+
+pheatmap(
+  heatmap_matrix,
+  scale = "row",
+  annotation_col = annotation_col,
+  labels_row = gene_labels,
+  filename = "results/differential_expression/top30_heatmap.png",
+  width = 8,
+  height = 10
 )
