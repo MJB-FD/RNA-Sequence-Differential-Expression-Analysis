@@ -162,3 +162,42 @@ GEO accession: **GSE52778**
 Organism: **Homo sapiens**
 
 Cell type: **human airway smooth muscle cells**
+
+
+## Running the Pipeline
+
+The full workflow can be run from the project root with:
+
+```bash
+bash scripts/run_pipeline.sh
+```
+
+The master script runs each stage sequentially:
+
+```text
+SRA download
+    ↓
+SRA → FASTQ conversion
+    ↓
+FastQC
+    ↓
+Reference download
+    ↓
+HISAT2 alignment
+    ↓
+Alignment summary
+    ↓
+featureCounts
+    ↓
+DESeq2 + visualization + GO enrichment
+```
+
+Each stage is also available as an individual script in the `scripts/` directory, allowing parts of the pipeline to be run or troubleshot independently.
+
+### Resource Requirements
+
+A complete run processes large sequencing files and requires substantial disk space. FASTQ files, BAM files, and the HISAT2 reference index can require approximately 40–50 GB of storage during the workflow.
+
+The pipeline runs major stages sequentially to limit memory usage. Computationally intensive steps, particularly HISAT2 alignment, may take several hours on lower-resource systems.
+
+Large intermediate files are excluded from GitHub because they can be regenerated using the provided scripts.
