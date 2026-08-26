@@ -311,3 +311,52 @@ pheatmap(
   width = 8,
   height = 10
 )
+
+##################################################
+# 25. GO Biological Process enrichment
+##################################################
+
+library(gprofiler2)
+
+# Significant DE genes
+genes_for_enrichment <- significant$gene_symbol
+genes_for_enrichment <- genes_for_enrichment[
+  !is.na(genes_for_enrichment)
+]
+
+# Genes actually tested in the RNA-seq analysis
+# Used as the enrichment background
+background_genes <- results_df$gene_symbol
+background_genes <- background_genes[
+  !is.na(background_genes)
+]
+
+# Run GO Biological Process enrichment
+go_results <- gost(
+  query = genes_for_enrichment,
+  organism = "hsapiens",
+  sources = "GO:BP",
+  correction_method = "fdr",
+  custom_bg = background_genes
+)
+
+# Keep CSV-friendly columns
+go_table <- go_results$result[
+  ,
+  c(
+    "source",
+    "term_id",
+    "term_name",
+    "p_value",
+    "term_size",
+    "query_size",
+    "intersection_size"
+  )
+]
+
+# Save results
+write.csv(
+  go_table,
+  "results/differential_expression/go_enrichment_results.csv",
+  row.names = FALSE
+)
